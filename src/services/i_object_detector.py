@@ -1,6 +1,6 @@
 import abc
 from typing import List, Union
-
+import cv2
 import numpy as np
 
 
@@ -30,7 +30,7 @@ class ObjectDetector(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def detect(
         self,
-        source: Union[str, int, np.ndarray],
+        source: Union[str, int, np.ndarray, cv2.typing.MatLike],
         confidence: float = 0.7,
         save=False,
         save_txt=False,

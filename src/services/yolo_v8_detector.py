@@ -20,7 +20,7 @@ from typing import Dict, List, Tuple, Union, cast
 import numpy as np
 from numpy.typing import NDArray
 from ultralytics import YOLO
-from i_object_detector import ObjectDetector
+from services.i_object_detector import ObjectDetector
 
 
 class YoloObjectDetector(ObjectDetector):
