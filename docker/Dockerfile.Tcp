@@ -1,0 +1,11 @@
+FROM ultralytics/ultralytics:8.1.31
+
+WORKDIR /app
+
+COPY ./src /app
+
+# Install any additional dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# (Optional) Specify default command to run your application
+CMD ["python", "server.py"]
