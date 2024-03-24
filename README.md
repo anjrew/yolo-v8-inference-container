@@ -6,7 +6,7 @@ A project with code enabling inference on video feed from within a docker contai
 
 1. [Setup your development environment](./docs/setting_up_the_environment.md).
 
-# Running the project
+# Running the Server
 
 ## Docker 
 

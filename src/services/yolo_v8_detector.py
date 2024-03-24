@@ -16,11 +16,14 @@ Note: This module requires the ultralytics and OpenCV libraries to be installed.
 """
 
 import logging
+import time
 from typing import Dict, List, Tuple, Union, cast
 import numpy as np
 from numpy.typing import NDArray
 from ultralytics import YOLO
 from services.i_object_detector import ObjectDetector
+
+LOGGER = logging.getLogger(__name__)
 
 
 class YoloObjectDetector(ObjectDetector):
@@ -29,7 +32,7 @@ class YoloObjectDetector(ObjectDetector):
     def __init__(self, model_name: str = "yolov8n.pt") -> None:
         self.model = YOLO(model_name)  # load an official model
         self.class_names = cast(Dict[str, str], self.model.names or {})
-        logging.debug("Detecting from : %s", self.class_names)
+        LOGGER.debug("Detecting from : %s", self.class_names)
         self.colors: NDArray[np.float64] = np.random.uniform(
             0, 255, size=(len(self.class_names), 3)
         )
@@ -45,7 +48,7 @@ class YoloObjectDetector(ObjectDetector):
         save=False,
         save_txt=False,
     ) -> List[dict]:
-
+        start_detect_time = time.time()
         res: List[dict] = []
 
         detections = self.model.predict(
@@ -75,5 +78,7 @@ class YoloObjectDetector(ObjectDetector):
                         rlt["mask"] = detection.masks[i].numpy().data
 
                     res.append(rlt)
-
+        LOGGER.debug(
+            "Image detection time: %s seconds", lambda: time.time() - start_detect_time
+        )
         return res
