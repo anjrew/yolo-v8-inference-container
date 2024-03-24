@@ -1,3 +1,5 @@
+"""Used for testing the object detector with a single file"""
+
 import argparse
 import logging
 import os
