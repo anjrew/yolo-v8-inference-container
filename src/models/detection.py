@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+import json
 from typing import Dict, Tuple, Union, cast
 
 
@@ -23,6 +24,14 @@ class Detection:
             "class_name": self.class_name,
             "confidence": self.confidence,
         }
+
+    def to_json(self) -> str:
+        return json.dumps(self.to_dict())
+
+    def to_vector(
+        self,
+    ) -> Tuple[int, int, int, int, float, str]:
+        return (*self.box, self.confidence, self.class_name)
 
     @classmethod
     def from_dict(
@@ -54,3 +63,14 @@ class Detection:
             class_name=cast(str, data["class_name"]),
             confidence=cast(int, data["confidence"]),
         )
+
+    @classmethod
+    def from_vector(cls, vector: Tuple[int, int, int, int, int, str]) -> "Detection":
+        if len(vector) != 6:
+            raise ValueError(
+                "Vector must be a tuple of 6 elements (top, right, bottom, left, confidence, class_name)"
+            )
+        box = vector[:4]  # Extract the box coordinates
+        confidence = vector[4]  # Extract the confidence
+        class_name = vector[5]  # Extract the class name
+        return cls(box=box, class_name=class_name, confidence=confidence)

@@ -31,7 +31,7 @@ if __name__ == "__main__":
             print("Failed to read frame from camera.")
             break
 
-        client.send_image(frame)
+        client.get_image_detections(frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break

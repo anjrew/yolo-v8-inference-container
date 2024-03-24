@@ -69,6 +69,9 @@ if __name__ == "__main__":
     cv2.destroyAllWindows()
 
     start_from_time = time.time()
-    client.send_image(image)
+    detections = client.get_image_detections(image)
     total_request_time = time.time() - start_from_time
     LOGGER.debug("Total request time: %.6f seconds", total_request_time)
+
+    for detection in detections:
+        print(detection)

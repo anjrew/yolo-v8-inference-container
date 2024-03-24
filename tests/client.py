@@ -1,6 +1,8 @@
+import json
 import socket
 import struct
 import logging
+from typing import List
 import cv2
 import numpy
 
@@ -25,7 +27,7 @@ class YoloV8ImageProcessingClient:
 
         return logger
 
-    def send_image(self, image_data: numpy.ndarray):
+    def get_image_detections(self, image_data: numpy.ndarray) -> List[object]:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((self.host, self.port))
             self.logger.info(f"Connected to server: {self.host}:{self.port}")
@@ -46,4 +48,8 @@ class YoloV8ImageProcessingClient:
             # Receive and print the response (bounding boxes and labels)
             response = s.recv(4096)
 
-            self.logger.info(f"Received response from the server: {response.decode()}")
+            decoded_string = response.decode()
+            self.logger.info(f"Received response from the server: {decoded_string}")
+            json_response = json.loads(decoded_string)
+
+            return json_response

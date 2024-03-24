@@ -1,3 +1,4 @@
+import json
 import socket
 import struct
 import cv2
@@ -98,7 +99,7 @@ class ObjectDetectionServer:
 
                     # Send back the bounding boxes and labels if requested
                     if self.return_coordinates:
-                        response = str(
+                        response = json.dumps(
                             [detection.to_dict() for detection in detections]
                         ).encode()
                         conn.sendall(response)
