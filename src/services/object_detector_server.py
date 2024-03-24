@@ -9,6 +9,8 @@ from typing import List
 from models.detection import Detection
 from services.i_object_detector import ObjectDetector
 
+LOGGER = logging.getLogger(__name__)
+
 
 class ObjectDetectionServer:
     def __init__(
@@ -25,21 +27,6 @@ class ObjectDetectionServer:
         self.port = port
         self.show_image = show_image
         self.return_coordinates = return_coordinates
-        self.logger = self.setup_logging(log_level)
-
-    def setup_logging(self, log_level: str) -> logging.Logger:
-        logger = logging.getLogger(self.__class__.__name__)
-        logger.setLevel(log_level)
-
-        formatter = logging.Formatter(
-            "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-        )
-
-        console_handler = logging.StreamHandler()
-        console_handler.setFormatter(formatter)
-        logger.addHandler(console_handler)
-
-        return logger
 
     def process_image(self, image_data: cv2.typing.MatLike) -> List[Detection]:
         """Process the image to get bounding boxes and labels
@@ -66,18 +53,18 @@ class ObjectDetectionServer:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((self.host, self.port))
             s.listen()
-            self.logger.info(f"Server listening on {self.host}:{self.port}")
+            LOGGER.info(f"Server listening on {self.host}:{self.port}")
 
             while True:
                 conn, addr = s.accept()
                 with conn:
-                    self.logger.info(f"Connected by {addr}")
+                    LOGGER.info(f"Connected by {addr}")
 
                     # Receiving image data
                     image_size = struct.unpack(">L", conn.recv(4))[
                         0
                     ]  # Assuming the first 4 bytes indicate the image size
-                    self.logger.debug(f"Received image size: {image_size} bytes")
+                    LOGGER.debug(f"Received image size: {image_size} bytes")
 
                     image_data = b""
                     while len(image_data) < image_size:
@@ -90,12 +77,12 @@ class ObjectDetectionServer:
                     nparr = np.frombuffer(image_data, np.uint8)  # type: ignore
                     image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-                    self.logger.info("Processing image...")
+                    LOGGER.debug("Processing image...")
 
                     # Process the image to get bounding boxes and labels
                     detections = self.process_image(image)
 
-                    self.logger.info("Image processing completed")
+                    LOGGER.debug("Image processing completed")
 
                     # Send back the bounding boxes and labels if requested
                     if self.return_coordinates:
@@ -103,4 +90,4 @@ class ObjectDetectionServer:
                             [detection.to_dict() for detection in detections]
                         ).encode()
                         conn.sendall(response)
-                        self.logger.info("Bounding box coordinates sent to the client")
+                        LOGGER.debug("Bounding box coordinates sent to the client")
