@@ -1,0 +1,5 @@
+# Ignore everything by default
+*
+
+# Explicitly include specific files or directories
+!src/

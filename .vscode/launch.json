@@ -22,6 +22,30 @@
             "request": "launch",
             "console": "integratedTerminal",
             "justMyCode": false
-        }
+        },
+        {
+            "name": "Yolo Server: Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/server.py",
+            "args": [
+                "--port",
+                "5000",
+                "--show-image"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Yolo Image Client: Debug",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/tests/test_image.py",
+            "args": [
+                "--show-image"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
     ]
 }

@@ -36,7 +36,6 @@ class YoloObjectDetector(ObjectDetector):
         self._class_name_id = {v: k for k, v in self.class_names.items()}
 
     def get_color_for_class_name(self, class_name: str) -> Tuple[int, int, int]:
-        """Gets the color for a particular class by name"""
         return self.colors[self._class_name_id[class_name]]  # type: ignore
 
     def detect(
@@ -46,7 +45,7 @@ class YoloObjectDetector(ObjectDetector):
         save=False,
         save_txt=False,
     ) -> List[dict]:
-        # return model.predict(uri, save=True, save_txt=True, conf=0.8)
+
         res: List[dict] = []
 
         detections = self.model.predict(

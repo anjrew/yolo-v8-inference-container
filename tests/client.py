@@ -1,15 +1,14 @@
 import socket
 import struct
-import os
-import argparse
 import logging
+import cv2
+import numpy
 
 
-class ImageProcessingClient:
-    def __init__(self, host: str, port: int, image_path: str, log_level: str):
+class YoloV8ImageProcessingClient:
+    def __init__(self, host: str, port: int, log_level: str):
         self.host = host
         self.port = port
-        self.image_path = image_path
         self.logger = self.setup_logging(log_level)
 
     def setup_logging(self, log_level: str) -> logging.Logger:
@@ -26,47 +25,24 @@ class ImageProcessingClient:
 
         return logger
 
-    def send_image(self):
+    def send_image(self, image_data: numpy.ndarray):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.connect((self.host, self.port))
             self.logger.info(f"Connected to server: {self.host}:{self.port}")
 
-            # Read image data
-            with open(self.image_path, "rb") as image_file:
-                image_data = image_file.read()
-                self.logger.debug(f"Image size: {len(image_data)} bytes")
+            # Encode the image data as JPEG
+            _, encoded_image = cv2.imencode(".jpg", image_data)
+            image_bytes = encoded_image.tobytes()
 
             # Send the size of the image first
-            s.sendall(struct.pack(">L", len(image_data)))
+            image_size = len(image_bytes)
+            s.sendall(struct.pack(">L", image_size))
             self.logger.info("Sent image size to the server")
 
             # Send the image data
-            s.sendall(image_data)
+            s.sendall(image_bytes)
             self.logger.info("Sent image data to the server")
 
             # Receive and print the response (bounding boxes and labels)
             response = s.recv(4096)
             self.logger.info(f"Received response from the server: {response.decode()}")
-
-
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Image Processing Client")
-    parser.add_argument(
-        "--host", default="localhost", help="Server host (default: localhost)"
-    )
-    parser.add_argument(
-        "--port", type=int, default=5000, help="Server port (default: 5000)"
-    )
-    parser.add_argument(
-        "--image-path",
-        default=os.path.abspath("./tests/images/bus.jpg"),
-        help="Path to the image file",
-    )
-    parser.add_argument("--log-level", default="INFO", help="Log level (default: INFO)")
-
-    args = parser.parse_args()
-
-    image_path = os.path.abspath(args.image_path)
-
-    client = ImageProcessingClient(args.host, args.port, image_path, args.log_level)
-    client.send_image()

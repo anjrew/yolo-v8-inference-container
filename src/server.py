@@ -35,4 +35,4 @@ if __name__ == "__main__":
         args.return_coordinates,
         args.log_level,
     )
-    server.run_server()
+    server.run()

@@ -29,3 +29,6 @@ MANIFEST
 
 # Env
 .env
+
+# Models 
+**.pt

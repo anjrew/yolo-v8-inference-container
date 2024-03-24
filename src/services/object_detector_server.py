@@ -26,7 +26,7 @@ class ObjectDetectionServer:
         self.logger = self.setup_logging(log_level)
 
     def setup_logging(self, log_level: str) -> logging.Logger:
-        logger = logging.getLogger("ImageProcessingServer")
+        logger = logging.getLogger(self.__class__.__name__)
         logger.setLevel(log_level)
 
         formatter = logging.Formatter(
@@ -42,6 +42,10 @@ class ObjectDetectionServer:
     def process_image(
         self, image_data: cv2.typing.MatLike
     ) -> List[Tuple[int, int, int, int, str]]:
+        """Process the image to get bounding boxes and labels
+        as a tuple of (x, y, w, h, label)
+
+        """
 
         if self.show_image:
             cv2.imshow("Image", image_data)
@@ -53,10 +57,12 @@ class ObjectDetectionServer:
 
             cv2.destroyAllWindows()
 
-        return self.object_detector.detect(image_data)
-        # return [(50, 60, 100, 200, "Example")]
+        return self.object_detector.detect(image_data)  # type: ignore
 
-    def run_server(self):
+    def run(self) -> None:
+        """
+        Run the image processing server.
+        """
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.bind((self.host, self.port))
             s.listen()
