@@ -21,6 +21,7 @@ from typing import Dict, List, Tuple, Union, cast
 import numpy as np
 from numpy.typing import NDArray
 from ultralytics import YOLO
+from models.detection import Detection
 from services.i_object_detector import ObjectDetector
 
 LOGGER = logging.getLogger(__name__)
@@ -31,7 +32,7 @@ class YoloObjectDetector(ObjectDetector):
 
     def __init__(self, model_name: str = "yolov8n.pt") -> None:
         self.model = YOLO(model_name)  # load an official model
-        self.class_names = cast(Dict[str, str], self.model.names or {})
+        self.class_names = cast(Dict[int, str], self.model.names or {})
         LOGGER.debug("Detecting from : %s", self.class_names)
         self.colors: NDArray[np.float64] = np.random.uniform(
             0, 255, size=(len(self.class_names), 3)
@@ -47,9 +48,11 @@ class YoloObjectDetector(ObjectDetector):
         confidence: float = 0.7,
         save=False,
         save_txt=False,
-    ) -> List[dict]:
+    ) -> List[Detection]:
+        """Detect objects in the given image or video frame using the YOLOv8 model."""
+
         start_detect_time = time.time()
-        res: List[dict] = []
+        res: List[Detection] = []
 
         detections = self.model.predict(
             source, save=save, save_txt=save_txt, conf=confidence
@@ -69,13 +72,11 @@ class YoloObjectDetector(ObjectDetector):
                     btm = box[3]
                     confidence = box[4]
 
-                    rlt = {
-                        "box": [int(lft), int(tp), int(rt), int(btm)],
-                        "class_name": self.class_names[int(box[5])],  # type: ignore
-                        "confidence": box[4],
-                    }
-                    if detection.masks:
-                        rlt["mask"] = detection.masks[i].numpy().data
+                    rlt = Detection(
+                        box=(int(lft), int(tp), int(rt), int(btm)),
+                        class_name=self.class_names[int(box[5])],
+                        confidence=box[4],
+                    )
 
                     res.append(rlt)
         LOGGER.debug(

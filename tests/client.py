@@ -45,4 +45,5 @@ class YoloV8ImageProcessingClient:
 
             # Receive and print the response (bounding boxes and labels)
             response = s.recv(4096)
+
             self.logger.info(f"Received response from the server: {response.decode()}")

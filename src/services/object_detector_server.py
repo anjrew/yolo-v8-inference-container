@@ -3,8 +3,9 @@ import struct
 import cv2
 import numpy as np
 import logging
-from typing import List, Tuple
+from typing import List
 
+from models.detection import Detection
 from services.i_object_detector import ObjectDetector
 
 
@@ -39,11 +40,9 @@ class ObjectDetectionServer:
 
         return logger
 
-    def process_image(
-        self, image_data: cv2.typing.MatLike
-    ) -> List[Tuple[int, int, int, int, str]]:
+    def process_image(self, image_data: cv2.typing.MatLike) -> List[Detection]:
         """Process the image to get bounding boxes and labels
-        as a tuple of (x, y, w, h, label)
+        as a tuple of (top, right, bottom, left, label)
 
         """
 
@@ -57,7 +56,7 @@ class ObjectDetectionServer:
 
             cv2.destroyAllWindows()
 
-        return self.object_detector.detect(image_data)  # type: ignore
+        return self.object_detector.detect(image_data)
 
     def run(self) -> None:
         """
@@ -93,12 +92,14 @@ class ObjectDetectionServer:
                     self.logger.info("Processing image...")
 
                     # Process the image to get bounding boxes and labels
-                    bounding_boxes = self.process_image(image)
+                    detections = self.process_image(image)
 
                     self.logger.info("Image processing completed")
 
                     # Send back the bounding boxes and labels if requested
                     if self.return_coordinates:
-                        response = str(bounding_boxes).encode()
+                        response = str(
+                            [detection.to_dict() for detection in detections]
+                        ).encode()
                         conn.sendall(response)
                         self.logger.info("Bounding box coordinates sent to the client")

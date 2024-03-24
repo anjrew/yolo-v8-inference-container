@@ -3,6 +3,8 @@ from typing import List, Union
 import cv2
 import numpy as np
 
+from models.detection import Detection
+
 
 class ObjectDetector(metaclass=abc.ABCMeta):
     """
@@ -34,7 +36,7 @@ class ObjectDetector(metaclass=abc.ABCMeta):
         confidence: float = 0.7,
         save=False,
         save_txt=False,
-    ) -> List[dict]:
+    ) -> List[Detection]:
         """
         Performs object detection on an image or video frame.
 
