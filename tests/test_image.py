@@ -77,3 +77,11 @@ if __name__ == "__main__":
 
     for detection in detections:
         print(detection)
+
+    if show_image:
+        cv2.imshow("Image", image)
+
+        while True:
+            key = cv2.waitKey(1) & 0xFF
+            if key == ord("q"):
+                break
