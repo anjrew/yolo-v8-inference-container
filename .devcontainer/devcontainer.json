@@ -1,0 +1,27 @@
+{
+    "name": "Ultralytics Dev Container",
+    "image": "ultralytics/ultralytics:8.1.31",
+    "runArgs": [
+        "--gpus",
+        "all"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "ms-azuretools.vscode-docker",
+                "GitHub.copilot",
+                "GitHub.copilot-chat",
+                "mhutchie.git-graph",
+                "ms-python.flake8",
+                "ms-python.black-formatter",
+                "yzhang.markdown-all-in-one",
+                "IronGeek.vscode-env"
+            ]
+        }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    }
+}
